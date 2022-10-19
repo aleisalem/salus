@@ -1,5 +1,5 @@
 FROM ruby:2.7.2@sha256:0fee695f3bf397bb521d8ced9e30963835fac44bc27f46393a5b91941c8a40aa as builder
-MAINTAINER security@coinbase.com
+LABEL email=security@gridx.de
 
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends \
   g++ \
@@ -172,6 +172,11 @@ RUN curl -fsSL "$NODE_DOWNLOAD_URL" -o node.tar.gz \
   && yarn install \
   && rm -rf /node.tar.gz package.json yarn.lock /tmp/* ~/.npm
 
+# Gitleaks
+RUN cd /home/ \
+  && clone https://github.com/zricethezav/gitleaks.git \
+  && cd gitleaks \
+  && make build
 
 ### Copy tools built in the previous
 ### `builder` stage into this image
@@ -188,6 +193,7 @@ COPY --from=builder /jdk-11.0.2 /jdk-11.0.2
 ENV JAVA_HOME /jdk-11.0.2
 COPY --from=builder /opt/gradle/gradle-7.3.3 /opt/gradle/gradle-7.3.3
 ENV PATH="/opt/gradle/gradle-7.3.3/bin:${PATH}"
+COPY --from=builder /home/gitleaks/gitleaks /usr/local/bin
 
 COPY --from=builder /opt/gradle/gradle-6.9.2 /opt/gradle/gradle-6.9.2
 

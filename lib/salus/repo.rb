@@ -9,7 +9,9 @@ module Salus
       { handle: :gemfile, filename: 'Gemfile' },
       { handle: :gemfile_lock, filename: 'Gemfile.lock' },
       { handle: :ruby_version, filename: '.ruby-version' },
-      # JS
+      # Node + JS + TS
+      { handle: :js_files, filename: '*.js', wildcard: true},
+      { handle: :ts_files, filename: '*.ts', wildcard: true},
       { handle: :package_json, filename: 'package.json' },
       { handle: :package_lock_json, filename: 'package-lock.json' },
       { handle: :yarn_lock, filename: 'yarn.lock' },
@@ -27,7 +29,7 @@ module Salus
       { handle: :go_mod, filename: 'go.mod' },
       { handle: :go_sum, filename: 'go.sum' },
       # Python
-      { handle: :requirements_txt, filename: 'requirements.txt' },
+      { handle: :requirements_txt, filename: 'requirements.txt' }, 
       { handle: :setup_cfg, filename: 'setup.cfg' },
       { handle: :py_files, filename: '*.py', wildcard: true },
       # Rust
@@ -50,7 +52,9 @@ module Salus
       { handle: :truffle_config_js, filename: 'truffle-config.js' },
       { handle: :truffle_config_ts, filename: 'truffle-config.ts' },
       { handle: :hardhat_config_js, filename: 'hardhat.config.js' },
-      { handle: :hardhat_config_ts, filename: 'hardhat.config.ts' }
+      { handle: :hardhat_config_ts, filename: 'hardhat.config.ts' },
+      # Gitleaks
+      { handle: :all_files, filename: '*', wildcard: true }
     ].freeze
 
     # Define file checkers.

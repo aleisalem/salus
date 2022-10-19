@@ -62,7 +62,8 @@ module Salus::Scanners
     end
 
     def version
-      Gem.loaded_specs["brakeman"].version.to_s
+      run_shell("brakeman -v")
+      #Gem.loaded_specs["brakeman"].version.to_s
     end
 
     def self.supported_languages
