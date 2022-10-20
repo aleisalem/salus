@@ -39,6 +39,8 @@ docker run --rm -t -v $(pwd):/home/repo coinbase/salus
 - [yarn audit](docs/scanners/yarn_audit.md) - Execution of [`yarn audit`](https://yarnpkg.com/lang/en/docs/cli/audit/) 1.22.0 which looks for CVEs in node module dependencies.
 - [PatternSearch](docs/scanners/pattern_search.md) - Execution of [`sift`](https://sift-tool.org/docs) 0.9.0, looks for certain strings in a project that might be dangerous or could require that certain strings be present.
 - [Cargo Audit](docs/scanners/cargo_audit.md) - Execution of [Cargo Audit](https://github.com/RustSec/cargo-audit) 0.14.0 Audit Cargo.lock files for crates with security vulnerabilities reported to the RustSec Advisory Database
+- [Gitleaks](https://github.com/zricethezav/gitleaks) - Execution of Gitleaks to identify any secrets and/or sensitive information that are left in the code base
+- [Nodejsscan](https://github.com/ajinabraham/nodejsscan) - Execution of [Nodejsscan](https://github.com/ajinabraham/nodejsscan) to look for common vulnerabilities in Javascript code
 
 ## Dependency Tracking
 

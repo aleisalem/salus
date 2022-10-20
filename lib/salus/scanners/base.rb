@@ -136,7 +136,6 @@ module Salus::Scanners
                   chdir: File.expand_path(@repository&.path_to_repo))
       # If we're passed a string, convert it to an array before passing to capture3
       command = command.split unless command.is_a?(Array)
-      # printf('[gridX] command: %s', command)
       Salus::PluginManager.send_event(:run_shell, command, chdir: chdir)
       #  chdir: '/some/directory'
       opts = { stdin_data: stdin_data }

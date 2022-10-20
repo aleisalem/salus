@@ -25,6 +25,7 @@ module Salus::Scanners
       options = get_config_options # Used for options that have values (i.e., not flags)
       command = GITLEAKS_COMMAND  
       command += "--redact " if @config["redact"] == true
+      command += "--no-git" if @config["no-git"] == true
       command += "#{options}"
       shell_return = run_shell(command, chdir: @repository.path_to_repo)
 

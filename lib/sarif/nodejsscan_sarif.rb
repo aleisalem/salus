@@ -1,12 +1,12 @@
 module Sarif
-  class GitleaksSarif < BaseSarif
+  class NodejsscanSarif < BaseSarif
     include Salus::SalusBugsnag
 
-    GITLEAKS_URI = 'https://github.com/zricethezav/gitleaks'.freeze
+    NODEJSSCAN_URI = 'https://github.com/ajinabraham/nodejsscan'.freeze
 
     def initialize(scan_report, repo_path = nil)
       super(scan_report, {}, repo_path)
-      @uri = GITLEAKS_URI
+      @uri = NODEJSSCAN_URI
       @logs = parse_scan_report!(scan_report)
     end
 
@@ -14,13 +14,22 @@ module Sarif
       logs = @scan_report.log('')
       return [] if logs.strip.empty?
 
-      all_secrets = JSON.parse(logs)
-      all_secrets
-      # parsed_secrets = []
-      # all_secrets.each do |secret|
-      #   parsed_secrets.push(parse_issue(secret))
-      # end      
-
+      raw_report = JSON.parse(logs)
+      all_issues = []
+      if raw_report.has_key? "nodejs"
+        all_rules = raw_report["nodejs"]
+      end
+      all_rules.each do |ruleId, ruleDetails|
+        if ruleDetails.has_key? "files"
+          ruleDetails["files"].each do |issue|
+            issue["rule"] = {}
+            issue["rule"]["id"] = ruleId
+            issue["rule"]["metadata"] = ruleDetails["metadata"]         
+            all_issues.push(issue)
+          end
+        end
+       end
+      all_issues
     rescue JSON::ParserError => e
       bugsnag_notify(e.message)
       []
@@ -28,35 +37,30 @@ module Sarif
       []
     end
 
-    def parse_issue(secret)
-      parsed_secret = {
+    def parse_issue(issue)
+      parsed_issue = {
           # Keys needed for "results"
-          id: secret["RuleID"],
+          id: issue["rule"]["id"],
           level: "MEDIUM",
-          details: "%s found in commit %s." % [secret["Description"], secret["Commit"]],
-          uri: secret["File"],
-          code: secret["Secret"],
-          start_line: secret["StartLine"],
-          start_column: secret["StartColumn"],
+          details: issue["rule"]["metadata"]["description"],
+          uri: issue["file_path"],
+          code: issue["match_string"],
+          start_line: issue["match_lines"][0],
+          start_column: issue["match_position"][0],
           properties: {
-            tags: secret["Tags"],
-            entropy: secret["Entropy"],
-            commit: secret["Commit"],
-            author: secret["Author"],
-            email: secret["Email"]
+            cwe: issue["rule"]["metadata"]["cwe"],
+            owasp: issue["rule"]["metadata"]["owasp-web"]
           },
           # Keys needed for "rules"
-          name: secret["Description"],
+          name: "%s - %s" % [issue["rule"]["metadata"]["owasp-web"], issue["rule"]["metadata"]["description"]],
           help_url: "mailto:security@gridx.de",
           # Keys needed for runs object
-          suppressed: false
-          
+          suppressed: false       
       }
     rescue => e
       bugsnag_notify(e.message)
       {}
-
-      parsed_secret
+      parsed_issue
     end
   
     def self.snippet_possibly_in_git_diff?(snippet, lines_added)

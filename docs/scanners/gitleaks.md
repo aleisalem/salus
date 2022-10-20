@@ -23,7 +23,6 @@ Since, at gridX, we are running salus in the CI/CD pipeline, we use the `detect`
 ```yaml
   scanner_configs:
     Gitleaks:
-      config: config_filename
       no-git: true or false # Whether to treat the target directory as a non Git repository
       redact: true or false # Whether to redact the actual secrets found in the repo
       verbose: true or false # Whether to output the STDOUT of the tool
@@ -43,7 +42,6 @@ The following Gitleaks config options are currently NOT supported.
 --max-target-megabytes # No limit on how large a file can be to be scanned
 --format {csv,custom,html,screen,txt,xml,yaml}   # We always export to JSON
 --source # Left to default
---msg-template MSG_TEMPLATE   # unsupported because it only works with --format custom
 ```
 
 ## Exceptions

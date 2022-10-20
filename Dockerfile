@@ -178,6 +178,9 @@ RUN cd /home/ \
   && cd gitleaks \
   && make build
 
+# nodejsscan
+RUN pip install nodejsscan
+
 ### Copy tools built in the previous
 ### `builder` stage into this image
 ENV PIP_VERSION 18.1

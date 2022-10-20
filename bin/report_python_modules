@@ -22,9 +22,21 @@ deps = parse_requirements(path, session="_")
 dependencies = {}
 
 for dependency in deps:
-    if hasattr(dependency.req, 'key'):
-      dependencies[dependency.req.key] = str(dependency.req.specifier)
-    else:
-      dependencies[dependency.req.name] = str(dependency.req.specifier)
+    try:
+        if hasattr(dependency, 'req'):
+            if hasattr(dependency.req, 'key'):
+                dependencies[dependency.req.key] = str(dependency.req.specifier)
+        else:
+            if hasattr(dependency, 'requirement'):
+                # TODO: Should fix the pip 20.1+ issue
+                req = dependency.requirement
+                for delimiter in ['<', '<=', '>', '>=', '~=', '==', '!=']:
+                    req = req.replace(delimiter, '|')
+                if len(req.split('|')) == 2:
+                    dependencies[req.split('|')[0]] = str(req.split('|')[1])
+            else:
+                dependencies[dependency.req.name] = str(dependency.req.specifier)
+    except Exception as e:
+        continue
 
 print(json.dumps(dependencies))
