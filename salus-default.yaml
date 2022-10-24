@@ -6,8 +6,54 @@
 
 config_version: 1
 
+# String
+# Used in the report to identify the project being scanned.
+project_name: "secDevLabs_Test"
+
+reports:
+  # - uri: file://tests/salus-report.txt
+  #   format: txt
+  - uri: file://salus-report.json
+    format: json
+    verbose: true
+  # - uri: https://salus-config.internal2.net/salus-report
+  #   format: json
+  #   verbose: true
+  #   post:
+  #     salus_report_param_name: 'report'
+  #     additional_params:
+  #       repo: 'Random Repo'
+  #       user: 'John Doe' 
+  # - uri: https://salus-config.internal2.net/salus-report
+  #   format: cyclonedx-json
+  #   put:
+  #   headers:
+  #     Age: '12'
+  #     X-API-Key: '{{RANDOM_API_KEY}}'
+  #   cyclonedx_options:
+  #     cyclonedx_project_name: '{{SALUS_BUILD_ORG}}/{{SALUS_BUILD_PROJECT}}'
+  #     spec_version: '1.3'
+  # - uri: file://salus-report.sarif
+  #   format: sarif
+  - uri: file://salus-report.sarif
+    format: sarif
+    sarif_options:
+      include_suppressed: true
+
 # What scanners should run. "all" or "none" are acceptable as well
-active_scanners: all
+active_scanners:
+  - RepoNotEmpty
+  # - Brakeman
+  # - BundleAudit
+  - Gosec
+  - NPMAudit
+  - YarnAudit
+  - PatternSearch
+  - Semgrep
+  # - CargoAudit
+  - Gitleaks
+  - Bandit
+  - Nodejsscan
 
 # enforced_scanners are scanners that cause Salus to exit !0 when they fail.
 # Controlling this list will allow you to choose which scanners must pass for
@@ -20,12 +66,23 @@ active_scanners: all
 # Other scanners may need to graduate from the testing phase or
 # should only be enforced explicitly by custom configuration.
 enforced_scanners:
-  - RepoNotEmpty
-  - Brakeman
-  - BundleAudit
-  - Gosec
-  - NPMAudit
-  - YarnAudit
-  - PatternSearch
-  - Semgrep
-  - CargoAudit
+   - RepoNotEmpty
+  # - Brakeman
+  # - BundleAudit
+  # - Gosec
+  # - NPMAudit
+  # - YarnAudit
+  # - PatternSearch
+  # - Semgrep
+  # - CargoAudit
+  # - Bandit
+  # - Gitleaks
+  # - Nodejsscan
+
+scanner_configs:
+  Gitleaks:
+    verbose: true
+    redact: true
+    exit-code: '2'
+  Nodejsscan:
+    missing-controls: false

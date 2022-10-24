@@ -43,20 +43,20 @@ ENV GRADLE_HOME="/opt/gradle/gradle-7.3.3"
 ENV PATH="${GRADLE_HOME}/bin:${PATH}"
 
 ### Rust
-ENV RUST_VERSION 1.58.1
-# Add a .sha256 to the rust download URL to get this sha
-ENV RUST_VERSION_SHA256 4fac6df9ea49447682c333e57945bebf4f9f45ec7b08849e507a64b2ccd5f8fb
-ENV RUST_TARBALL_FILE rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
-ENV RUST_DOWNLOAD_URL https://static.rust-lang.org/dist/${RUST_TARBALL_FILE}
-ENV CARGO_AUDIT_VERSION 0.14.0
+# ENV RUST_VERSION 1.58.1
+# # Add a .sha256 to the rust download URL to get this sha
+# ENV RUST_VERSION_SHA256 4fac6df9ea49447682c333e57945bebf4f9f45ec7b08849e507a64b2ccd5f8fb
+# ENV RUST_TARBALL_FILE rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+# ENV RUST_DOWNLOAD_URL https://static.rust-lang.org/dist/${RUST_TARBALL_FILE}
+# ENV CARGO_AUDIT_VERSION 0.14.0
 
 # Download manually and verify the hash
-RUN curl -fsSL "$RUST_DOWNLOAD_URL" -o rust.tar.gz \
-  && echo "$RUST_VERSION_SHA256 rust.tar.gz" | sha256sum -c - \
-  && mkdir rust \
-  && tar -C rust -xf rust.tar.gz --strip-components=1 \
-  && rust/install.sh \
-  && cargo install cargo-audit --version "$CARGO_AUDIT_VERSION"
+# RUN curl -fsSL "$RUST_DOWNLOAD_URL" -o rust.tar.gz \
+#   && echo "$RUST_VERSION_SHA256 rust.tar.gz" | sha256sum -c - \
+#   && mkdir rust \
+#   && tar -C rust -xf rust.tar.gz --strip-components=1 \
+#   && rust/install.sh \
+#   && cargo install cargo-audit --version "$CARGO_AUDIT_VERSION"
 
 ### Python
 # Install bandit, python static code scanner
@@ -83,18 +83,18 @@ RUN cd /home \
 
 
 ### Golang
-# required for sift and gosec
+# required for sift, gosec, and gitleaks
 
-ENV GOLANG_VERSION 1.18
-ENV GOLANG_DOWNLOAD_SHA256 e85278e98f57cdb150fe8409e6e5df5343ecb13cebf03a5d5ff12bd55a80264f
+ENV GOLANG_VERSION 1.19
+ENV GOLANG_DOWNLOAD_SHA256 464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6
 
 ENV GOLANG_TARBALL_FILE go$GOLANG_VERSION.linux-amd64.tar.gz
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/${GOLANG_TARBALL_FILE}
 
-ENV GOSEC_VERSION 2.11.0
+ENV GOSEC_VERSION 2.14.0
 ENV GOSEC_TARBALL_FILE gosec_${GOSEC_VERSION}_linux_amd64.tar.gz
 ENV GOSEC_DOWNLOAD_URL https://github.com/securego/gosec/releases/download/v${GOSEC_VERSION}/${GOSEC_TARBALL_FILE}
-ENV GOSEC_DOWNLOAD_SHA256 1ee94e43df294981a9ae41d04dcfeae9cd1b015e738a5caaa860adb7ac1dccd8
+ENV GOSEC_DOWNLOAD_SHA256 226bd8825b7aed3d454446d1ec094f817f37859dded4211a5b707d0f36c5fdb7
 ENV GO111MODULE on
 
 RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
@@ -111,6 +111,12 @@ RUN curl -fsSL "$GOSEC_DOWNLOAD_URL" -o gosec.tar.gz \
 ENV SIFT_VERSION v0.9.0
 
 RUN go install github.com/svent/sift@${SIFT_VERSION}
+
+# Gitleaks
+RUN cd /home/ \
+  && git clone https://github.com/zricethezav/gitleaks.git \
+  && cd gitleaks \
+  && make build
 
 
 ### semgrep
@@ -131,7 +137,7 @@ RUN dpkg -i ripgrep_13.0.0_amd64.deb
 
 FROM ruby:2.7.2-slim@sha256:b9eebc5a6956f1def4698fac0930e7a1398a50c4198313fe87af0402cab8d149
 
-ENV PATH="/root/.cargo/bin:/root/.local/bin:${PATH}"
+# ENV PATH="/root/.cargo/bin:/root/.local/bin:${PATH}"
 
 # Required so that Brakeman doesn't run into encoding
 # issues when it parses non-ASCII characters.
@@ -147,11 +153,11 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get inst
   python-setuptools \
   python3-minimal \
   python3-setuptools \
+  python-pip \
+  python3-pip \ 
   curl \
   git \
   && rm -rf /var/lib/apt/lists/*
-
-
 
 ### JS + Node
 ENV NODE_VERSION 16.15.1
@@ -172,12 +178,6 @@ RUN curl -fsSL "$NODE_DOWNLOAD_URL" -o node.tar.gz \
   && yarn install \
   && rm -rf /node.tar.gz package.json yarn.lock /tmp/* ~/.npm
 
-# Gitleaks
-RUN cd /home/ \
-  && clone https://github.com/zricethezav/gitleaks.git \
-  && cd gitleaks \
-  && make build
-
 # nodejsscan
 RUN pip install nodejsscan
 
@@ -186,10 +186,10 @@ RUN pip install nodejsscan
 ENV PIP_VERSION 18.1
 COPY --from=builder /root/go/bin/sift /usr/local/bin
 COPY --from=builder /root/gosec/gosec /usr/local/bin
-COPY --from=builder /usr/local/bin/cargo /usr/local/bin
+# COPY --from=builder /usr/local/bin/cargo /usr/local/bin
 COPY --from=builder /root/vendor /home/vendor
 COPY --from=builder /root/.local /root/.local
-COPY --from=builder /root/.cargo /root/.cargo
+# COPY --from=builder /root/.cargo /root/.cargo
 COPY --from=builder /usr/local/go /usr/local/go
 COPY --from=builder /usr/bin/rg /usr/bin/rg
 COPY --from=builder /jdk-11.0.2 /jdk-11.0.2

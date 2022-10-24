@@ -55,7 +55,7 @@ module Salus::Scanners
       end
       report_stdout(json)
 
-      json.fetch(:advisories).values
+      json.fetch(:vulnerabilities).values
     end
   end
 end
