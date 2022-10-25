@@ -43,14 +43,11 @@ reports:
 # What scanners should run. "all" or "none" are acceptable as well
 active_scanners:
   - RepoNotEmpty
-  # - Brakeman
-  # - BundleAudit
   - Gosec
   - NPMAudit
   - YarnAudit
   - PatternSearch
   - Semgrep
-  # - CargoAudit
   - Gitleaks
   - Bandit
   - Nodejsscan
@@ -67,14 +64,11 @@ active_scanners:
 # should only be enforced explicitly by custom configuration.
 enforced_scanners:
    - RepoNotEmpty
-  # - Brakeman
-  # - BundleAudit
   # - Gosec
   # - NPMAudit
   # - YarnAudit
   # - PatternSearch
   # - Semgrep
-  # - CargoAudit
   # - Bandit
   # - Gitleaks
   # - Nodejsscan
@@ -84,5 +78,6 @@ scanner_configs:
     verbose: true
     redact: true
     exit-code: '2'
+    log-opts: 'HEAD^...HEAD'
   Nodejsscan:
     missing-controls: false

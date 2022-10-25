@@ -27,6 +27,7 @@ Since, at gridX, we are running salus in the CI/CD pipeline, we use the `detect`
       redact: true or false # Whether to redact the actual secrets found in the repo
       verbose: true or false # Whether to output the STDOUT of the tool
       exit-code: 'integer_value'
+      log-opts: 'commitA...commitB' # The commit range to scan (e.g., HEAD^...HEAD)
       # exceptions:
       #   - advisory_id: test_id1
       #     changed_by: security-team

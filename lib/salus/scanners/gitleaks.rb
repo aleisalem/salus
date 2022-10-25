@@ -27,6 +27,7 @@ module Salus::Scanners
       command += "--redact " if @config["redact"] == true
       command += "--no-git" if @config["no-git"] == true
       command += "#{options}"
+      printf('SERVUS: %s', command)
       shell_return = run_shell(command, chdir: @repository.path_to_repo)
 
       # Gitleaks has the following behavior:
@@ -65,6 +66,11 @@ module Salus::Scanners
           'exit-code': {
             type: :string,
             regex: /^\d+$/
+          },
+          'log-opts': {
+            type: :string,
+            separator: '=',
+            regex: /\A\w+\^?\.{3}\w+\z/i
           }
         }
       ) 

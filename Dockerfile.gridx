@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   python3-pip \
   python3-dev \
   python3-setuptools \
-  python-wheel \
+  #python-wheel \
   musl-dev \
   make \
   cmake \
@@ -74,7 +74,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   gcc \
   gnupg2 \
   libicu-dev \
-  software-properties-common \
+  #software-properties-common \
   && rm -rf \
     /var/lib/apt/lists/* \
     /var/cache/debconf/* \
@@ -82,11 +82,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     /tmp/* \ 
     /var/tmp/* \
   && apt-get clean
-
-# Install yarn
-# RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add \
-#   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-#   && apt-get update && apt-get install -y --no-install-recommends yarn
 
 ##############################
 # Install Python-based Tools #
@@ -147,13 +142,23 @@ RUN cd / \
 
 ### Copy tools built in the previous
 ### `builder` stage into this image
-ENV PIP_VERSION 18.1
+#ENV PIP_VERSION 18.1
 COPY --from=builder /root/go/bin/sift /usr/local/bin
 COPY --from=builder /root/gosec/gosec /usr/local/bin
 #COPY --from=builder /usr/local/go /usr/local/go
 COPY --from=builder /usr/bin/rg /usr/bin/rg
 COPY --from=builder /root/gitleaks/gitleaks /usr/local/bin
-RUN ln -sf /usr/local/go/bin/go /usr/local/bin
+#RUN ln -sf /usr/local/go/bin/go /usr/local/bin
+
+# Remove some of the installed packages
+RUN apt-get remove --yes \
+  python3-pip \
+  python3-setuptools \
+  make \
+  cmake \
+  g++ \
+  gcc \
+  gnupg2 
 
 #############
 ### Salus ###
@@ -175,4 +180,4 @@ COPY salus-default.yaml /home/
 USER gridx
 
 # run the salus scan when this docker container is run 
-# ENTRYPOINT ["bash", "-c", "-l", "bundle exec ./bin/salus scan"]
+ENTRYPOINT ["bash", "-c", "-l", "bundle exec ./bin/salus scan"]

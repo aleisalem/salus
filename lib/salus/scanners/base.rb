@@ -333,7 +333,6 @@ module Salus::Scanners
 
     def create_string_option(keyword:, value:, prefix:, separator:, suffix:, regex: /.*/)
       return '' unless validate_string_option(keyword, value, regex)
-
       "#{prefix}#{keyword}#{separator}#{Shellwords.escape(value)}#{suffix}"
     end
 
@@ -504,7 +503,7 @@ module Salus::Scanners
                        report_warn(:scanner_misconfiguration, warning)
                        '' # Return an empty string and warn
                      else
-                       build_option(
+                       result = build_option(
                          prefix: type_value[:prefix] || prefix,
                          suffix: type_value[:suffix] || suffix,
                          separator: type_value[:separator] || separator,
@@ -514,7 +513,9 @@ module Salus::Scanners
                          regex: type_value[:regex] || default_regex,
                          join_by: type_value[:join_by] || join_by
                        )
-                     end
+                       # Special case for Gitleaks' --log-opts option
+                       result = "--log-opts=#{config_value} " if result.include? "log-opts"
+                       result                     end
                    when Regexp # Assume it is a string type if just regex is supplied
                      result = build_option(
                        prefix: prefix,
